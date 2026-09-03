@@ -1,4 +1,4 @@
-# TaskManager
+# TaskManager (with Angular 22 and ASP.NET Core Web API on .NET 8)
 
 A full-stack task management application built with Angular 22 and ASP.NET Core Web API on .NET 8. Users can register, log in securely, and manage their own tasks through a RESTful API and Angular frontend.
 
