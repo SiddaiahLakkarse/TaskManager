@@ -1,6 +1,41 @@
 # TaskManager
 
-A full-stack task manager sample: Angular standalone components + Angular Material frontend and ASP.NET Core 8 Web API + Entity Framework Core + SQL Server backend.
+A full-stack task management application built with Angular 22 and ASP.NET Core Web API on .NET 8. Users can register, log in securely, and manage their own tasks through a RESTful API and Angular frontend.
+
+## Features
+
+- User registration and login
+- JWT bearer authentication with BCrypt password hashing
+- Protected Angular routes and automatic JWT authorization
+- Create, view, edit, complete, search, filter, and delete tasks
+- User-specific task access
+- Swagger/OpenAPI documentation
+- Entity Framework Core migrations
+- Development-time automatic database migration
+
+## Technology stack
+
+### Frontend
+
+- Angular 22, TypeScript, Angular Router, and Angular Forms
+- Angular Material and CDK
+- SCSS, RxJS, and Vite development server
+- Vitest testing framework
+
+### Backend
+
+- ASP.NET Core Web API on .NET 8
+- C# and Entity Framework Core 8
+- SQL Server LocalDB
+- RESTful API architecture and dependency injection
+- Swagger/OpenAPI
+
+### Authentication
+
+- JWT bearer tokens
+- BCrypt password hashing
+- Angular authentication guard
+- Angular HTTP authentication interceptor
 
 ## Structure
 
@@ -12,26 +47,62 @@ A full-stack task manager sample: Angular standalone components + Angular Materi
 
 ## Prerequisites
 
-Install .NET 8 SDK or later, Node.js 20+, SQL Server (Developer/Express/localDB), and the Angular CLI (`npm install -g @angular/cli`).
+Install the .NET 8 SDK, Node.js 20 or later, npm, SQL Server LocalDB, and Visual Studio with the ASP.NET and web development and Node.js development workloads.
+
+Verify the installed tools:
+
+```powershell
+dotnet --version
+node --version
+npm --version
+```
 
 ## SQL Server and backend
 
-1. Create or start a SQL Server instance. The default development connection uses Windows authentication and trusts the local development certificate.
-2. Update `backend/TaskManager.Api/appsettings.json` (or use user secrets/environment variables) with `ConnectionStrings:DefaultConnection` and a long random `Jwt:Key`.
-3. From the repository root run:
+The development database uses SQL Server LocalDB:
+
+```text
+Server=(localdb)\\MSSQLLocalDB;
+Database=TaskManagerDb;
+Trusted_Connection=True;
+TrustServerCertificate=True;
+MultipleActiveResultSets=true
+```
+
+Connect in Visual Studio SQL Server Object Explorer using `(localdb)\\MSSQLLocalDB` and Windows Authentication. Refresh the Databases node to view `TaskManagerDb`.
+
+The project includes an `InitialCreate` migration. When the API runs in Development, pending migrations are applied automatically. The migration creates `Users`, `Tasks`, and `__EFMigrationsHistory`.
+
+To apply migrations manually from the repository root:
 
 ```powershell
 dotnet tool install --global dotnet-ef
-dotnet ef migrations add InitialCreate --project backend/TaskManager.Api --startup-project backend/TaskManager.Api
 dotnet ef database update --project backend/TaskManager.Api --startup-project backend/TaskManager.Api
-dotnet run --project backend/TaskManager.Api --urls https://localhost:7001
 ```
 
 The model seeds `demo@example.com` / `Demo1234!` and one sample task. Change this password before using the sample beyond development.
 
-## Frontend
+## Running the application
 
-The Angular environment is in `frontend/src/environments/environment.ts`; change `apiUrl` if the API uses another port. The checked-in CORS policy allows `http://localhost:4200`.
+### Visual Studio
+
+1. Open `TaskManager.sln`.
+2. Set `TaskManager.Api` as the startup project.
+3. Select the `https` launch profile.
+4. Press **F5**.
+5. Open `http://localhost:4200`.
+
+The ASP.NET Core SPA proxy starts the Angular development server automatically.
+
+### Manual startup
+
+Run the backend:
+
+```powershell
+dotnet run --project backend/TaskManager.Api --launch-profile https
+```
+
+Run the frontend in a second terminal:
 
 ```powershell
 cd frontend
@@ -39,17 +110,19 @@ npm install
 npm start -- --host localhost --port 4200
 ```
 
-Open `http://localhost:4200`. Accept the local HTTPS certificate warning when calling the API, or configure the API to use HTTP during development and update the environment URL.
+The Angular API URL is configured in `frontend/src/environments/environment.ts`. Change `apiUrl` if the API uses another port. The checked-in CORS policy allows `http://localhost:4200`.
 
-## Run both projects with Visual Studio
+Open `http://localhost:4200`. Accept the local HTTPS certificate warning when calling the API if prompted.
 
-1. Complete the SQL Server and database setup above.
-2. Open `TaskManager.sln` in Visual Studio.
-3. In Solution Explorer, right-click `TaskManager.Api` and choose **Set as Startup Project**. Do not start the `frontend` project separately; the ASP.NET Core SPA proxy starts it automatically.
-4. Select the backend `https` launch profile.
-5. Press **F5**.
+## Application URLs
 
-Visual Studio starts the ASP.NET Core API on `https://localhost:7001` and automatically starts the Angular development server with `npm start` on `http://localhost:4200`. The browser opens the frontend. Stop debugging to stop both processes. The first F5 run may take a moment while the frontend dependencies are restored; run `npm install` in `frontend` first if needed.
+| Component | URL or value |
+|---|---|
+| Angular frontend | `http://localhost:4200` |
+| ASP.NET Core API | `https://localhost:7001` |
+| Swagger | `https://localhost:7001/swagger` |
+| SQL Server instance | `(localdb)\\MSSQLLocalDB` |
+| Database | `TaskManagerDb` |
 
 ## API examples
 
@@ -85,3 +158,42 @@ DELETE /api/tasks/{id}
 ## Design decisions
 
 JWT claims carry the user ID; every task query and mutation scopes by that claim, preventing cross-user access. EF Core owns persistence and migrations, while controllers remain thin. Angular keeps the token in a dedicated storage service, attaches it only through an interceptor, and protects the dashboard route with a functional guard. API URL and secrets are configuration-driven rather than embedded in application logic.
+
+## Testing and build
+
+Run frontend tests:
+
+```powershell
+cd frontend
+npm test
+```
+
+Build the backend:
+
+```powershell
+dotnet build backend/TaskManager.Api/TaskManager.Api.csproj
+```
+
+## Default development account
+
+```text
+Email: demo@example.com
+Password: Demo1234!
+```
+
+## Security notes
+
+The JWT key in `appsettings.json` is for local development only and must not be reused in production. Before production deployment:
+
+- Replace the development JWT key.
+- Store secrets in environment variables, .NET User Secrets, Azure Key Vault, or another secure store.
+- Use a production SQL Server instance instead of LocalDB.
+- Restrict CORS to approved frontend domains.
+- Enforce HTTPS and use least-privilege database credentials.
+- Never commit production passwords, tokens, or connection secrets.
+
+## GitHub repository description
+
+> A full-stack task management application built with Angular 22, ASP.NET Core Web API on .NET 8, Entity Framework Core, SQL Server LocalDB, JWT authentication, and BCrypt password hashing.
+
+Suggested GitHub topics: `angular`, `typescript`, `dotnet`, `aspnet-core`, `web-api`, `entity-framework-core`, `sql-server`, `localdb`, `jwt-authentication`, `rest-api`, `task-management`, `full-stack`.
