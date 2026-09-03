@@ -1,0 +1,8 @@
+@use '@angular/material' as mat;
+@include mat.core();
+html, body { height: 100%; margin: 0; font-family: Roboto, Arial, sans-serif; }
+.auth { max-width: 420px; margin: 8rem auto; padding: 2rem; display: grid; gap: 1rem; }
+.auth form, form { display: grid; gap: 1rem; } .auth p { color: #b3261e; }
+mat-sidenav-container { height: 100vh; } mat-sidenav { padding: 1.5rem; width: 220px; } mat-sidenav a, mat-sidenav button { display: block; width: 100%; text-align: left; }
+section, .list { padding: 2rem; } header, .filters { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; } header { justify-content: space-between; }
+table { width: 100%; }

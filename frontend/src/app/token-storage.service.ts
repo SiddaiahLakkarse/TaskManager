@@ -1,0 +1,2 @@
+import { Injectable } from '@angular/core';
+@Injectable({ providedIn: 'root' }) export class TokenStorageService { private key = 'taskmanager.auth'; get token() { return this.value?.token ?? null; } get user() { return this.value; } private get value(): any { const raw = localStorage.getItem(this.key); return raw ? JSON.parse(raw) : null; } save(value: any) { localStorage.setItem(this.key, JSON.stringify(value)); } clear() { localStorage.removeItem(this.key); } }
